@@ -2,6 +2,7 @@ import json
 import random
 from tkinter import *
 from tkinter import messagebox, ttk
+from tkinter import ttk
 
 
 class VocabularyApp:
@@ -91,45 +92,78 @@ class VocabularyApp:
         words_window = Toplevel(self.master)
         words_window.title("Выбор слов для изучения")
 
-        # Фрейм для чекбоксов
-        frame = Frame(words_window)
-        frame.pack(padx=10, pady=10)
+        # Основной контейнер
+        main_frame = Frame(words_window)
+        main_frame.pack(padx=10, pady=10, fill=BOTH, expand=True)
 
+        # Создаем Canvas и Scrollbar
+        canvas = Canvas(main_frame)
+        scrollbar = ttk.Scrollbar(main_frame, orient="vertical", command=canvas.yview)
+        scrollable_frame = Frame(canvas)
+
+        # Настройка прокрутки
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(
+                scrollregion=canvas.bbox("all")
+            )
+        )
+
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
+        # Привязка колеса мыши ко всему окну
+        def on_mousewheel(event):
+            if event.delta:
+                canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+            else:
+                # Для Linux
+                if event.num == 4:
+                    canvas.yview_scroll(-1, "units")
+                elif event.num == 5:
+                    canvas.yview_scroll(1, "units")
+
+        # Привязка событий для разных платформ
+        words_window.bind("<MouseWheel>", on_mousewheel)
+        words_window.bind("<Button-4>", on_mousewheel)
+        words_window.bind("<Button-5>", on_mousewheel)
+
+        # Добавление чекбоксов
         self.check_vars = {}
-
-        # Храним чекбоксы и их данные
         self.check_widgets = []
-
-        row = 0
         for eng, ru in self.words.items():
             var = BooleanVar()
             text = f"{eng} - {ru}" if self.show_translation else f"{eng} - ****"
-            cb = Checkbutton(frame, text=text, variable=var)
-            cb.grid(row=row, column=0, sticky=W)
+            cb = Checkbutton(scrollable_frame,
+                             text=text,
+                             variable=var,
+                             anchor="w",
+                             width=30)
+            cb.pack(fill="x", pady=2)
             self.check_widgets.append((cb, eng, ru))
             self.check_vars[eng] = var
-            row += 1
 
-        # Фрейм для кнопок управления
-        control_frame = Frame(words_window)
-        control_frame.pack(pady=10)
+        # Фрейм для кнопок
+        button_frame = Frame(words_window)
+        button_frame.pack(pady=10)
 
-        # Кнопка переключения видимости
-        Button(control_frame, text="👁️", command=lambda: self.toggle_translation(words_window)
-               ).pack(side=LEFT, padx=5)
+        Button(button_frame,
+               text="👁️",
+               command=lambda: self.toggle_translation(words_window),
+               width=5).pack(side=LEFT, padx=5)
 
-        # Кнопка сохранения выбора
-        Button(control_frame, text="Сохранить выбор",
+        Button(button_frame,
+               text="Сохранить",
                command=lambda: self.save_selection(words_window)).pack(side=LEFT, padx=5)
-
 
     def toggle_translation(self, window):
         self.show_translation = not self.show_translation
-        # Обновляем все чекбоксы
         for cb, eng, ru in self.check_widgets:
             new_text = f"{eng} - {ru}" if self.show_translation else f"{eng} - ****"
             cb.config(text=new_text)
-        # Обновляем окно
         window.update()
 
 
