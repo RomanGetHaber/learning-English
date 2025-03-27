@@ -41,16 +41,24 @@ class VocabularyApp:
 
     def setup_clipboard_shortcuts(self, widget):
         # Привязка горячих клавиш для копирования/вставки
-        widget.bind("<Control-c>", self.copy_text)
-        widget.bind("<Control-v>", self.paste_text)
+        widget.bind("<Control-KeyPress>", self.handle_ctrl_shortcut)
+
+    def handle_ctrl_shortcut(self, event):
+        # Проверяем код физической клавиши и состояние Ctrl
+        if event.state & 0x0004:  # Проверка что Ctrl нажат
+            if event.keycode == 86:  # Физическая клавиша V (английская) / М (русская)
+                self.paste_text(event)
+                return "break"
+            elif event.keycode == 67:  # Физическая клавиша C (английская) / С (русская)
+                self.copy_text(event)
+                return "break"
+
 
     def copy_text(self, event):
         event.widget.event_generate("<<Copy>>")
-        return "break"
 
     def paste_text(self, event):
         event.widget.event_generate("<<Paste>>")
-        return "break"
 
 
     def load_words(self):
