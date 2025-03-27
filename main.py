@@ -9,6 +9,8 @@ class VocabularyApp:
         self.master = master
         self.master.title("Учим английские слова")
         self.master.geometry("400x300")
+        # показывать перевод да/нет
+        self.show_translation = True
 
         # Загрузка словаря
         self.words = self.load_words()
@@ -94,24 +96,51 @@ class VocabularyApp:
         frame.pack(padx=10, pady=10)
 
         self.check_vars = {}
+
+        # Храним чекбоксы и их данные
+        self.check_widgets = []
+
         row = 0
         for eng, ru in self.words.items():
             var = BooleanVar()
-            cb = Checkbutton(frame, text=f"{eng} - {ru}", variable=var)
+            text = f"{eng} - {ru}" if self.show_translation else f"{eng} - ****"
+            cb = Checkbutton(frame, text=text, variable=var)
             cb.grid(row=row, column=0, sticky=W)
+            self.check_widgets.append((cb, eng, ru))
             self.check_vars[eng] = var
             row += 1
 
+        # Фрейм для кнопок управления
+        control_frame = Frame(words_window)
+        control_frame.pack(pady=10)
+
+        # Кнопка переключения видимости
+        Button(control_frame, text="👁️", command=lambda: self.toggle_translation(words_window)
+               ).pack(side=LEFT, padx=5)
+
         # Кнопка сохранения выбора
-        Button(words_window, text="Сохранить выбор",
-               command=lambda: self.save_selection(words_window)).pack(pady=10)
+        Button(control_frame, text="Сохранить выбор",
+               command=lambda: self.save_selection(words_window)).pack(side=LEFT, padx=5)
+
+
+    def toggle_translation(self, window):
+        self.show_translation = not self.show_translation
+        # Обновляем все чекбоксы
+        for cb, eng, ru in self.check_widgets:
+            new_text = f"{eng} - {ru}" if self.show_translation else f"{eng} - ****"
+            cb.config(text=new_text)
+        # Обновляем окно
+        window.update()
+
 
     def save_selection(self, window):
         self.selected_words = [
             eng for eng, var in self.check_vars.items() if var.get()
         ]
         window.destroy()
+        self.check_widgets = []  # Очищаем список виджетов
         messagebox.showinfo("Выбор сохранен", f"Выбрано слов: {len(self.selected_words)}")
+
 
     def start_learning(self):
         if not self.selected_words:
