@@ -175,17 +175,26 @@ class VocabularyApp:
         self.check_widgets = []  # Очищаем список виджетов
         messagebox.showinfo("Выбор сохранен", f"Выбрано слов: {len(self.selected_words)}")
 
-
     def start_learning(self):
         if not self.selected_words:
             messagebox.showerror("Ошибка", "Сначала выберите слова для изучения!")
             return
 
+        # Подготовка данных для этапов
+        # Этап 1: русский → английский
+        self.stage1_words = [(self.words[eng], eng) for eng in self.selected_words]
+        # Этап 2: английский → русский
+        self.stage2_words = [(eng, self.words[eng]) for eng in self.selected_words]
+
+        self.current_stage = 1
+        self.remaining_stage1 = self.stage1_words.copy()
+        self.remaining_stage2 = self.stage2_words.copy()
+
         # Создаем окно обучения
         learn_window = Toplevel(self.master)
         learn_window.title("Режим обучения")
 
-        self.current_word = None
+        self.current_question = None
         self.correct_answer = None
         self.buttons = []
 
@@ -199,42 +208,71 @@ class VocabularyApp:
         # Создаем 6 кнопок в два столбца
         for i in range(6):
             btn = Button(buttons_frame, text="", width=20,
-                         command=lambda idx=i: self.check_answer(idx))
+                         command=lambda idx=i: self.check_answer(idx, learn_window))
             btn.grid(row=i // 2, column=i % 2, padx=5, pady=5)
             self.buttons.append(btn)
 
         self.next_word(learn_window)
 
     def next_word(self, window):
-        if not self.selected_words:
-            messagebox.showinfo("Конец", "Вы изучили все выбранные слова!")
+        # Проверяем завершение всех этапов
+        if self.current_stage == 1 and not self.remaining_stage1:
+            self.current_stage = 2
+        if self.current_stage == 2 and not self.remaining_stage2:
+            messagebox.showinfo("Конец", "Все этапы пройдены!")
             window.destroy()
             return
 
-        self.current_word = random.choice(self.selected_words)
-        self.selected_words.remove(self.current_word)
-        self.word_label.config(text=self.current_word)
+        # Выбираем слова для текущего этапа
+        if self.current_stage == 1:
+            remaining = self.remaining_stage1
+            all_answers = [eng for ru, eng in self.stage1_words]
+        else:
+            remaining = self.remaining_stage2
+            all_answers = [ru for eng, ru in self.stage2_words]
+
+        if not remaining:
+            remaining = self.stage1_words.copy() if self.current_stage == 1 else self.stage2_words.copy()
+            if self.current_stage == 1:
+                self.remaining_stage1 = remaining
+            else:
+                self.remaining_stage2 = remaining
+
+        # Выбираем случайный вопрос
+        self.current_question = random.choice(remaining)
+        question_text, correct_answer = self.current_question
+
+        self.word_label.config(text=question_text)
 
         # Генерируем варианты ответов
-        correct = self.words[self.current_word]
-        wrongs = [v for k, v in self.words.items()
-                  if k != self.current_word and v != correct]
-        random.shuffle(wrongs)
-
-        answers = [correct] + wrongs[:5]
+        wrong_answers = [ans for ans in all_answers if ans != correct_answer]
+        random.shuffle(wrong_answers)
+        answers = [correct_answer] + wrong_answers[:5]
         random.shuffle(answers)
-        self.correct_answer = answers.index(correct)
+        self.correct_answer = answers.index(correct_answer)
 
-        # Обновляем текст кнопок
+        # Обновляем кнопки
         for i, btn in enumerate(self.buttons):
-            btn.config(text=answers[i] if i < len(answers) else "", bg='SystemButtonFace')
+            btn.config(text=answers[i] if i < len(answers) else "",
+                       bg='SystemButtonFace')
 
-    def check_answer(self, button_idx):
+    def check_answer(self, button_idx, window):
         if button_idx == self.correct_answer:
             self.buttons[button_idx].config(bg='green')
-            self.master.after(1000, self.next_word, self.master.winfo_children()[-1])
+            # Удаляем вопрос из текущего этапа
+            if self.current_stage == 1:
+                self.remaining_stage1.remove(self.current_question)
+            else:
+                self.remaining_stage2.remove(self.current_question)
+            self.master.after(1000, self.next_word, window)
         else:
             self.buttons[button_idx].config(bg='red')
+            # Возвращаем вопрос в конец списка
+            if self.current_stage == 1:
+                self.remaining_stage1.append(self.current_question)
+            else:
+                self.remaining_stage2.append(self.current_question)
+            self.master.after(1000, self.next_word, window)
 
 
 if __name__ == "__main__":
