@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5f43045-9809-4291-b94d-e18a3c473de5" name="Changes" comment="крайнее изменение">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/first.py" beforeDir="false" afterPath="$PROJECT_DIR$/first.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/words.json" beforeDir="false" afterPath="$PROJECT_DIR$/words.json" afterDir="false" />
-    </list>
+    <list default="true" id="b5f43045-9809-4291-b94d-e18a3c473de5" name="Changes" comment="изменил 3й принт" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -23,6 +19,12 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="SWAP_SIDES_IN_COMPARE_BRANCHES" value="true" />
   </component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/RomanGetHaber/learning-English.git",
+    "accountId": "3a5f6e2c-8e50-4409-b0f0-9722e731e99e"
+  }
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
 }</component>
@@ -74,7 +76,23 @@
       <option name="project" value="LOCAL" />
       <updated>1743417522069</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="добавил 3й принт">
+      <option name="closed" value="true" />
+      <created>1743475885895</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1743475885895</updated>
+    </task>
+    <task id="LOCAL-00004" summary="изменил 3й принт">
+      <option name="closed" value="true" />
+      <created>1743476068771</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1743476068771</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -103,6 +121,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="изменил вторую функцию в first.py" />
     <MESSAGE value="крайнее изменение" />
-    <option name="LAST_COMMIT_MESSAGE" value="крайнее изменение" />
+    <MESSAGE value="добавил 3й принт" />
+    <MESSAGE value="изменил 3й принт" />
+    <option name="LAST_COMMIT_MESSAGE" value="изменил 3й принт" />
   </component>
 </project>
